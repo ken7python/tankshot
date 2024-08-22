@@ -27,6 +27,8 @@ int main(void)
     int bullet_d = 0;
     int is_bullet_on_screen = 0;
 
+    int gameover = 0;
+
     while (!WindowShouldClose())
     {
         if (IsKeyDown(KEY_UP)){
@@ -126,6 +128,14 @@ int main(void)
         if (x_distance > 0 && x_distance < 50 && y_distamnce > 0 && y_distamnce < 50 ){
             enemy_life = enemy_life - 1;
         }
+
+        int player_enemy_x = enemy_x - tank_x;
+        int player_enemy_y = enemy_y - tank_y;
+        if (player_enemy_x > 0 && player_enemy_x < 70 && player_enemy_y > 0 && player_enemy_y < 150 ){
+            gameover = 1;
+        }
+
+
         if (enemy_d == 0){
             enemy_y = enemy_y - 1;
         }else
@@ -146,6 +156,9 @@ int main(void)
             DrawTextureEx(bullet,(Vector2){bullet_x,bullet_y},bullet_d,1.0,WHITE);
             if (enemy_life > 0){
                 DrawTextureEx(enemy,(Vector2){enemy_x,enemy_y},enemy_d,1.0,WHITE);
+            }
+            if (gameover == 1){
+                DrawText("GAMEOVER",200,200,70,RED);
             }
         EndDrawing();
     }
