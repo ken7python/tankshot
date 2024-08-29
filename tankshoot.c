@@ -124,21 +124,21 @@ int main(void)
         }
 
         int x_distance = enemy_x - bullet_x;
-        int y_distamnce = enemy_y - bullet_y;
-        if (x_distance > 0 && x_distance < 50 && y_distamnce > 0 && y_distamnce < 50 ){
+        int y_distance = enemy_y - bullet_y;
+        if (x_distance > 0 && x_distance < 50 && y_distance > 0 && y_distance < 50 ){
             enemy_life = enemy_life - 1;
         }
 
         int player_enemy_x = enemy_x - tank_x;
         int player_enemy_y = enemy_y - tank_y;
-        if (player_enemy_x > 0 && player_enemy_x < 70 && player_enemy_y > 0 && player_enemy_y < 150 ){
+        if (enemy_life > 0 && player_enemy_x > 0 && player_enemy_x < 70 && player_enemy_y > 0 && player_enemy_y < 150 ){
             gameover = 1;
         }
 
-
-        if (enemy_d == 0){
-            enemy_y = enemy_y - 1;
-        }else
+        if (enemy_life>0){
+            if (enemy_d == 0){
+                enemy_y = enemy_y - 1;
+            }else
             if (enemy_d == 90){
                 enemy_x = enemy_x + 1;
             }else
@@ -147,6 +147,7 @@ int main(void)
             }else
             if (enemy_d == 270){
                 enemy_x = enemy_x - 1;
+            }
         }
         BeginDrawing();
 
@@ -160,6 +161,9 @@ int main(void)
             if (gameover == 1){
                 DrawText("GAMEOVER",200,200,70,RED);
             }
+            DrawCircle(tank_x,tank_y,5,RED);
+            DrawCircle(enemy_x,enemy_y,5,BLUE);
+            DrawCircle(bullet_x,bullet_y,5,YELLOW);
         EndDrawing();
     }
     CloseWindow();
