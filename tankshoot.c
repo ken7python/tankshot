@@ -2,24 +2,52 @@
 #include "raylib.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
+
+void enemy_appear(int* x,int* y,int *d,int* life ){
+    *d = 90 * (rand()%4);
+
+    if (*d == 0){
+        *x = 400;
+        *y = 450;
+    }else
+    if (*d == 90){
+        *x = 0;
+        *y = 225;
+    }else
+    if (*d == 180){
+        *x = 400;
+        *y = 0;
+    }else
+    if (*d == 270){
+        *x = 800;
+        *y = 220;
+    }
+    
+    *life = 1;
+}
 
 int main(void)
 {
+    srand(time(NULL));
+
     const int screenWidth = 800;
     const int screenHeight = 450;
     InitWindow(screenWidth, screenHeight, "raylib [core] example - basic window");
     SetTargetFPS(60);
 
     Texture2D tank = LoadTexture("tank.png");
-    int tank_y = 400;
     int tank_x = 400;
+    int tank_y = 225;
     int tank_d = 0;
     
     Texture2D enemy = LoadTexture("enemy_tank.png");
-    int enemy_x = 400;
-    int enemy_y = 100;
-    int enemy_d = 180;
-    int enemy_life = 1;
+    
+    int enemy_x = 0;
+    int enemy_y = 0;
+    int enemy_d = 0;
+    int enemy_life = 0;
+    enemy_appear(&enemy_x,&enemy_y,&enemy_d,&enemy_life);
 
     Texture2D bullet = LoadTexture("bullet.png");
     int bullet_x = -100;
@@ -61,22 +89,7 @@ int main(void)
         }else
         if (IsKeyPressed(KEY_RIGHT)){
             tank_d = tank_d + 90;
-            /*
 
-            if (tank_d == 90){
-                tank_x = tank_x + 50;
-            }else
-            if (tank_d == 180){
-                tank_y = tank_y + 50;
-            }else
-            if (tank_d == 270){
-                tank_x = tank_x - 50;
-            }else
-            if (tank_d == 360){
-                tank_y = tank_y - 50;
-                tank_d = 0;
-            }
-            */
             if (tank_d == 360){
                 tank_d = 0;
             }
@@ -87,23 +100,7 @@ int main(void)
             if (tank_d == -90){
                 tank_d = 270;
             }
-    /*
-            if (tank_d == 270){
-                tank_y = tank_y + 50;
-            }else
-            if (tank_d == 180){
-                tank_x = tank_x + 50;
-            }else
-            if (tank_d == 90){
-                tank_y = tank_y - 50;
-            }else
-            if (tank_d == 0){
-                tank_x = tank_x - 50;
-                tank_d = 0;
-            }
-            */
-
-        }else
+        }
         if (IsKeyPressed(KEY_SPACE) && is_bullet_on_screen==0 ){
             bullet_x = tank_x;
             bullet_y = tank_y;
@@ -154,6 +151,10 @@ int main(void)
             if (enemy_d == 270){
                 enemy_x = enemy_x - 1;
             }
+
+            if (enemy_x < 0 || 800 < enemy_x || enemy_y < 0 || 450 < enemy_y){
+                enemy_appear(&enemy_x,&enemy_y,&enemy_d,&enemy_life);
+            }
         }
         BeginDrawing();
 
@@ -175,7 +176,7 @@ int main(void)
             if (enemy_life > 0){
                 //敵の表示
                 Vector2 enemy_origin = {enemy.width / 2.0f,enemy.height / 2.0f};
-                Rectangle enemy_sourceRect = {0.0f,0.0f,(float)tank.width,(float)tank.height};
+                Rectangle enemy_sourceRect = {0.0f,0.0f,(float)enemy.width,(float)enemy.height};
                 Rectangle enemy_destRect = {enemy_x,enemy_y,(float)enemy.width,enemy.height};
                 //DrawTextureEx(enemy,(Vector2){enemy_x,enemy_y},enemy_d,1.0,WHITE);
                 DrawTexturePro(enemy, enemy_sourceRect, enemy_destRect, enemy_origin, enemy_d, WHITE);
@@ -183,9 +184,11 @@ int main(void)
             if (gameover == 1){
                 DrawText("GAMEOVER",200,200,70,RED);
             }
+            /*
             DrawCircle(tank_x,tank_y,5,RED);
             DrawCircle(enemy_x,enemy_y,5,BLUE);
             DrawCircle(bullet_x,bullet_y,5,YELLOW);
+            */
         EndDrawing();
     }
     CloseWindow();
