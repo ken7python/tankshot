@@ -8,27 +8,28 @@ void enemy_appear(int* x,int* y,int *d,int* life ){
     *d = 90 * (rand()%4);
 
     if (*d == 0){
-        *x = 400;
+        *x = (rand() % 800);
         *y = 450;
     }else
     if (*d == 90){
         *x = 0;
-        *y = 225;
+        *y = (rand() % 450);
     }else
     if (*d == 180){
-        *x = 400;
+        *x = (rand() % 800);
         *y = 0;
     }else
     if (*d == 270){
         *x = 800;
-        *y = 220;
+        *y = (rand() % 450);
     }
-    
     *life = 1;
+
 }
 
 int main(void)
 {
+    int score = 0;
     srand(time(NULL));
 
     const int screenWidth = 800;
@@ -155,6 +156,9 @@ int main(void)
             if (enemy_x < 0 || 800 < enemy_x || enemy_y < 0 || 450 < enemy_y){
                 enemy_appear(&enemy_x,&enemy_y,&enemy_d,&enemy_life);
             }
+        }else{
+            score += 10;
+            enemy_appear(&enemy_x,&enemy_y,&enemy_d,&enemy_life);
         }
         BeginDrawing();
 
@@ -189,6 +193,9 @@ int main(void)
             DrawCircle(enemy_x,enemy_y,5,BLUE);
             DrawCircle(bullet_x,bullet_y,5,YELLOW);
             */
+            char scoreText[20];
+            sprintf(scoreText,"Score: %d",score);
+            DrawText(scoreText,10,10,50,GREEN);
         EndDrawing();
     }
     CloseWindow();
