@@ -58,8 +58,11 @@ int main(void)
 
     int gameover = 0;
 
+    int gameclear = 0;
+    int clearscore = 50;
     while (!WindowShouldClose())
     {
+        if (gameover == 0 && gameclear == 0){
         if (IsKeyDown(KEY_UP)){
             if (tank_d == 0){
                 tank_y = tank_y - 1;
@@ -158,7 +161,13 @@ int main(void)
             }
         }else{
             score += 10;
-            enemy_appear(&enemy_x,&enemy_y,&enemy_d,&enemy_life);
+            if (score >= clearscore){
+                gameclear = 1;
+            }
+            else{
+                enemy_appear(&enemy_x,&enemy_y,&enemy_d,&enemy_life);
+            }
+        }
         }
         BeginDrawing();
 
@@ -188,14 +197,27 @@ int main(void)
             if (gameover == 1){
                 DrawText("GAMEOVER",200,200,70,RED);
             }
+            if (gameclear == 1){
+                DrawText("GAMECLEAR",200,200,70,SKYBLUE);
+            }
             /*
             DrawCircle(tank_x,tank_y,5,RED);
             DrawCircle(enemy_x,enemy_y,5,BLUE);
             DrawCircle(bullet_x,bullet_y,5,YELLOW);
             */
+        /*
             char scoreText[20];
             sprintf(scoreText,"Score: %d",score);
             DrawText(scoreText,10,10,50,GREEN);
+        */
+        float progress = (float)score / clearscore;
+        DrawRectangle(10,10,300,25,GRAY);
+        DrawRectangle(10,10,(int)300 * progress,25,GREEN);
+
+        char progressText[20];
+        sprintf(progressText,"%d%%",(int)(progress*100));
+        DrawText(progressText,350,10,50,BLACK);
+
         EndDrawing();
     }
     CloseWindow();
