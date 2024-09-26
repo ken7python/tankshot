@@ -60,9 +60,45 @@ int main(void)
 
     int gameclear = 0;
     int clearscore = 50;
+
+    int mouse_x;//マウスのx座標
+    int mouse_y;//マウスのy座標
+    int distance_x;//マウスと戦車の距離x
+    int distance_y;//マウスと戦車の距離y
     while (!WindowShouldClose())
     {
         if (gameover == 0 && gameclear == 0){
+        mouse_x = GetTouchX();
+        mouse_y = GetTouchY();
+        distance_x = mouse_x - tank_x;//マウスと戦車との距離X
+        distance_y = mouse_y - tank_y;//マウスと戦車との距離Y
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){//タップされたとき
+            if (abs(distance_x) < 25 && abs(distance_y) < 25  && is_bullet_on_screen==0){//戦車がクリックされ、弾発射中でないなら発射
+                bullet_x = tank_x;
+                bullet_y = tank_y;
+                bullet_d = tank_d;
+            }
+        }
+        if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) && (abs(distance_x) > 25 || abs(distance_y) > 25) ){//画面が押され、戦車がクリックされていないとき
+            if (abs(distance_x) > abs(distance_y) ){//横移動のとき
+                if (distance_x > 0){//右移動
+                    tank_d = 90;
+                    tank_x = tank_x + 1;
+                }else{//左移動
+                    tank_d = 270;
+                    tank_x = tank_x - 1;
+                }
+            }else
+            if (abs(distance_y) > abs(distance_x) ){//縦移動のとき
+                if (distance_y > 0){//下移動
+                    tank_d = 180;
+                    tank_y = tank_y + 1;
+                }else{//上移動
+                    tank_d = 0;
+                    tank_y = tank_y - 1;
+                }
+            }
+        }
         if (IsKeyDown(KEY_UP)){
             if (tank_d == 0){
                 tank_y = tank_y - 1;
