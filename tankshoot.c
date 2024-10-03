@@ -65,6 +65,8 @@ int main(void)
     int mouse_y;//マウスのy座標
     int distance_x;//マウスと戦車の距離x
     int distance_y;//マウスと戦車の距離y
+
+    int clear_time;//タイム
     while (!WindowShouldClose())
     {
         if (gameover == 0 && gameclear == 0){
@@ -199,6 +201,7 @@ int main(void)
             score += 10;
             if (score >= clearscore){
                 gameclear = 1;
+                clear_time = GetTime();
             }
             else{
                 enemy_appear(&enemy_x,&enemy_y,&enemy_d,&enemy_life);
@@ -234,7 +237,8 @@ int main(void)
                 DrawText("GAMEOVER",200,200,70,RED);
             }
             if (gameclear == 1){
-                DrawText("GAMECLEAR",200,200,70,SKYBLUE);
+                DrawText("GAMECLEAR",200,150,70,SKYBLUE);
+                DrawText(TextFormat("Time:%d Second",clear_time),150,250,70,SKYBLUE);
             }
             /*
             DrawCircle(tank_x,tank_y,5,RED);
