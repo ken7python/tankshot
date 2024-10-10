@@ -107,6 +107,11 @@ int main(void)
     #define BULL_N 3
     struct Bullet bullets[BULL_N];
 
+    int j = BULL_N;
+    while(0 <= --j){
+        Bullet_init(&bullets[j]);
+    }
+
     int gameover = 0;
 
     int gameclear = 0;
@@ -228,10 +233,15 @@ int main(void)
             }
         }
 
-        int x_distance = enemy_x - bullet_x;
-        int y_distance = enemy_y - bullet_y;
-        if (x_distance > -25 && x_distance < 25 && y_distance > -25 && y_distance < 25 ){
-            enemy_life = enemy_life - 1;
+        i = BULL_N;
+        while(0 <= --i){
+            if (bullets[i].s){
+                int x_distance = enemy_x - bullets[i].x;
+                int y_distance = enemy_y - bullets[i].y;
+                if (x_distance > -25 && x_distance < 25 && y_distance > -25 && y_distance < 25 ){
+                    enemy_life = enemy_life - 1;
+                }
+            }
         }
 
         int player_enemy_x = enemy_x - tank_x;
