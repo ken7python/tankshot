@@ -4,6 +4,54 @@
 #include <stdlib.h>
 #include <time.h>
 
+struct Bullet{
+    int s;
+    int x;
+    int y;
+    int d;
+};
+
+void Bullet_init(struct Bullet* this){
+    this->s = 0;
+    this->x = -100;
+    this->y = -100;
+    this->d = 0;
+}
+
+void Bullet_shot(struct Bullet* this, int tank_x, int tank_y, int tank_d){
+    this->s = 1;
+    this->x = tank_x;
+    this->y = tank_y;
+    this->d = tank_d;
+}
+
+void Bullet_draw(struct Bullet* this, Texture2D* bullet){
+    if(this->s){
+        Vector2 bullet_origin = {bullet->width / 2.0f,bullet->height / 2.0f};
+        Rectangle bullet_sourceRect = {0.0f,0.0f,(float)bullet->width,(float)bullet->height};
+        Rectangle bullet_destRect = {this->x,this->y,(float)bullet->width,bullet->height};
+        DrawTexturePro(*bullet, bullet_sourceRect, bullet_destRect, bullet_origin, this->d, WHITE);
+    }
+}
+// Bullet/
+
+
+
+// for Bullets[]
+struct Bullet* takeUnusedBullet(struct Bullet bullets[], int count){
+    while(0 <= --count){
+        if(bullets[count].s){
+            // none
+        }else{
+            return &bullets[count];
+        }
+    }
+    return NULL;
+}
+// Bullets/
+
+
+
 void enemy_appear(int* x,int* y,int *d,int* life ){
     *d = 90 * (rand()%4);
 
@@ -55,6 +103,9 @@ int main(void)
     int bullet_y = -100;
     int bullet_d = 0;
     int is_bullet_on_screen = 0;
+
+    #define BULL_N 3
+    struct Bullet bullets[BULL_N];
 
     int gameover = 0;
 
@@ -144,28 +195,37 @@ int main(void)
             }
         }
         if (IsKeyPressed(KEY_SPACE) && is_bullet_on_screen==0 ){
-            bullet_x = tank_x;
-            bullet_y = tank_y;
-            bullet_d = tank_d;
+            struct Bullet* pbullet = takeUnusedBullet(bullets, BULL_N);
+            if(pbullet){
+                Bullet_shot(pbullet, tank_x, tank_y, tank_d);
+            }else{
+                // none
+            }
         }
 
-        if (bullet_d == 0){
-            bullet_y = bullet_y - 3;
-        }else
-        if (bullet_d == 90){
-            bullet_x = bullet_x + 3;
-        }else
-        if (bullet_d == 180){
-            bullet_y = bullet_y + 3;
-        }else
-        if (bullet_d == 270){
-            bullet_x = bullet_x - 3;
+        int i = BULL_N;
+        while(0 <= --i){
+            if (bullets[i].s && bullets[i].d == 0){
+                bullets[i].y = bullets[i].y - 3;
+            }else
+            if (bullets[i].s && bullets[i].d == 90){
+                bullets[i].x = bullets[i].x + 3;
+            }else
+            if (bullets[i].s && bullets[i].d == 180){
+                bullets[i].y = bullets[i].y + 3;
+            }else
+            if (bullets[i].s && bullets[i].d == 270){
+                bullets[i].x = bullets[i].x - 3;
+            }
         }
 
-        if (bullet_x < 0 || bullet_x > screenWidth || bullet_y < 0 || bullet_y > screenHeight){
-            is_bullet_on_screen = 0;
-        }else{
-            is_bullet_on_screen = 1;
+        i = BULL_N;
+        while(0 <= --i){
+            if (bullets[i].x < 0 || bullets[i].x > screenWidth || bullets[i].y < 0 || bullets[i].y > screenHeight){
+                Bullet_init(&bullets[i]);
+            }else{
+                // none
+            }
         }
 
         int x_distance = enemy_x - bullet_x;
@@ -219,12 +279,17 @@ int main(void)
             DrawTexturePro(tank, tank_sourceRect, tank_destRect, tank_origin, tank_d, WHITE);
 
             //弾の表示
-            Vector2 bullet_origin = {bullet.width / 2.0f,bullet.height / 2.0f};
-            Rectangle bullet_sourceRect = {0.0f,0.0f,(float)bullet.width,(float)bullet.height};
-            Rectangle bullet_destRect = {bullet_x,bullet_y,(float)bullet.width,bullet.height};
-            //DrawTextureEx(bullet,(Vector2){bullet_x,bullet_y},bullet_d,1.0,WHITE);
-            DrawTexturePro(bullet, bullet_sourceRect, bullet_destRect, bullet_origin, enemy_d, WHITE);
-            //DrawTextureEx(tank,(Vector2){tank_x,tank_y},tank_d,1.0,WHITE);
+            // Vector2 bullet_origin = {bullet.width / 2.0f,bullet.height / 2.0f};
+            // Rectangle bullet_sourceRect = {0.0f,0.0f,(float)bullet.width,(float)bullet.height};
+            // Rectangle bullet_destRect = {bullet_x,bullet_y,(float)bullet.width,bullet.height};
+            // //DrawTextureEx(bullet,(Vector2){bullet_x,bullet_y},bullet_d,1.0,WHITE);
+            // DrawTexturePro(bullet, bullet_sourceRect, bullet_destRect, bullet_origin, enemy_d, WHITE);
+            // //DrawTextureEx(tank,(Vector2){tank_x,tank_y},tank_d,1.0,WHITE);
+            int i=BULL_N;
+            while(0 <= --i){
+                Bullet_draw(&bullets[i], &bullet);
+            }
+
             if (enemy_life > 0){
                 //敵の表示
                 Vector2 enemy_origin = {enemy.width / 2.0f,enemy.height / 2.0f};
