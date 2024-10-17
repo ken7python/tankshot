@@ -115,7 +115,7 @@ int main(void)
     int gameover = 0;
 
     int gameclear = 0;
-    int clearscore = 50;
+    int clearscore = 100;
 
     int mouse_x;//マウスのx座標
     int mouse_y;//マウスのy座標
@@ -123,6 +123,14 @@ int main(void)
     int distance_y;//マウスと戦車の距離y
 
     int clear_time;//タイム
+
+    int hera_time = GetTime();//スコアを減らすタイム
+
+    int enemy_bullet_x = -100;
+    int enemy_bullet_y = -100;
+    int enemy_bullet_d = 0;
+    int enemy_bullet_t = GetTime();
+
     while (!WindowShouldClose())
     {
         if (gameover == 0 && gameclear == 0){
@@ -208,6 +216,31 @@ int main(void)
             }
         }
 
+        // enemy_think
+        {
+            if(5 < GetTime() - enemy_bullet_t){
+                enemy_bullet_x = enemy_x;
+                enemy_bullet_y = enemy_y;
+                enemy_bullet_d = enemy_d;
+                enemy_bullet_t = GetTime();
+            }
+
+            if(enemy_bullet_x != -100 && enemy_bullet_y != -100){
+                if(enemy_bullet_d == 0){
+                    enemy_bullet_y = enemy_bullet_y - 3;
+                }else
+                if(enemy_bullet_d == 90){
+                    enemy_bullet_x = enemy_bullet_x + 3;
+                }else
+                if(enemy_bullet_d == 180){
+                    enemy_bullet_y = enemy_bullet_y + 3;
+                }else
+                if(enemy_bullet_d == 270){
+                    enemy_bullet_x = enemy_bullet_x - 3;
+                }
+            }
+        }
+
         int i = BULL_N;
         while(0 <= --i){
             if (bullets[i].s && bullets[i].d == 0){
@@ -278,6 +311,14 @@ int main(void)
             }
         }
         }
+
+        if(0 < score){
+            if(3 < GetTime() - hera_time){
+                score = score - 1;
+                hera_time = GetTime();
+            }
+        }
+
         BeginDrawing();
 
             ClearBackground(RAYWHITE);
@@ -298,6 +339,14 @@ int main(void)
             int i=BULL_N;
             while(0 <= --i){
                 Bullet_draw(&bullets[i], &bullet);
+            }
+
+            //敵の弾の表示
+            {
+                Vector2 bullet_origin = {bullet.width / 2.0f,bullet.height / 2.0f};
+                Rectangle bullet_sourceRect = {0.0f,0.0f,(float)bullet.width,(float)bullet.height};
+                Rectangle bullet_destRect = {enemy_bullet_x,enemy_bullet_y,(float)bullet.width,bullet.height};
+                DrawTexturePro(bullet, bullet_sourceRect, bullet_destRect, bullet_origin, enemy_bullet_d, WHITE);
             }
 
             if (enemy_life > 0){
