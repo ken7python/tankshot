@@ -126,6 +126,7 @@ int main(void)
 
     int hera_time = GetTime();//スコアを減らすタイム
 
+    Texture2D enemy_bullet = LoadTexture("enemy_bullet.png");
     int enemy_bullet_x = -100;
     int enemy_bullet_y = -100;
     int enemy_bullet_d = 0;
@@ -351,10 +352,10 @@ int main(void)
 
             //敵の弾の表示
             {
-                Vector2 bullet_origin = {bullet.width / 2.0f,bullet.height / 2.0f};
-                Rectangle bullet_sourceRect = {0.0f,0.0f,(float)bullet.width,(float)bullet.height};
-                Rectangle bullet_destRect = {enemy_bullet_x,enemy_bullet_y,(float)bullet.width,bullet.height};
-                DrawTexturePro(bullet, bullet_sourceRect, bullet_destRect, bullet_origin, enemy_bullet_d, WHITE);
+                Vector2 bullet_origin = {enemy_bullet.width / 2.0f,enemy_bullet.height / 2.0f};
+                Rectangle bullet_sourceRect = {0.0f,0.0f,(float)enemy_bullet.width,(float)enemy_bullet.height};
+                Rectangle bullet_destRect = {enemy_bullet_x,enemy_bullet_y,(float)enemy_bullet.width,enemy_bullet.height};
+                DrawTexturePro(enemy_bullet, bullet_sourceRect, bullet_destRect, bullet_origin, enemy_bullet_d, WHITE);
             }
 
             if (enemy_life > 0){
