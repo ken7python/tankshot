@@ -277,6 +277,14 @@ int main(void)
             }
         }
 
+        {
+            int x_distance = tank_x - enemy_bullet_x;
+            int y_distance = tank_y - enemy_bullet_y;
+            if (x_distance > -25 && x_distance < 25 && y_distance > -25 && y_distance < 25 ){
+                gameover = 1;
+            }
+        }
+
         int player_enemy_x = enemy_x - tank_x;
         int player_enemy_y = enemy_y - tank_y;
         if (enemy_life > 0 && player_enemy_x > -25 && player_enemy_x < 25 && player_enemy_y > -25 && player_enemy_y < 25 ){
