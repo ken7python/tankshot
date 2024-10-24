@@ -312,6 +312,7 @@ int main(void)
         }else{
             score += 10;
             if (score >= clearscore){
+                score = clearscore;
                 gameclear = 1;
                 clear_time = GetTime();
             }
@@ -321,7 +322,7 @@ int main(void)
         }
         }
 
-        if(0 < score){
+        if(0 < score && !gameclear && !gameover){
             if(3 < GetTime() - hera_time){
                 score = score - 1;
                 hera_time = GetTime();
