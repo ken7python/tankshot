@@ -95,6 +95,7 @@ int main(void)
     int enemy_x = 0;
     int enemy_y = 0;
     int enemy_d = 0;
+    int enemy_spd = 5;
     int enemy_life = 0;
     enemy_appear(&enemy_x,&enemy_y,&enemy_d,&enemy_life);
 
@@ -130,7 +131,11 @@ int main(void)
     int enemy_bullet_x = -100;
     int enemy_bullet_y = -100;
     int enemy_bullet_d = 0;
+    int enemy_bullet_spd = 0;
     int enemy_bullet_t = GetTime();
+
+    int item_x = -100;
+    int item_y = -100;
 
     while (!WindowShouldClose())
     {
@@ -223,21 +228,22 @@ int main(void)
                 enemy_bullet_x = enemy_x;
                 enemy_bullet_y = enemy_y;
                 enemy_bullet_d = enemy_d;
+                enemy_bullet_spd = enemy_spd + 3;
                 enemy_bullet_t = GetTime();
             }
 
             if(enemy_bullet_x != -100 && enemy_bullet_y != -100){
                 if(enemy_bullet_d == 0){
-                    enemy_bullet_y = enemy_bullet_y - 3;
+                    enemy_bullet_y = enemy_bullet_y - enemy_bullet_spd;
                 }else
                 if(enemy_bullet_d == 90){
-                    enemy_bullet_x = enemy_bullet_x + 3;
+                    enemy_bullet_x = enemy_bullet_x + enemy_bullet_spd;
                 }else
                 if(enemy_bullet_d == 180){
-                    enemy_bullet_y = enemy_bullet_y + 3;
+                    enemy_bullet_y = enemy_bullet_y + enemy_bullet_spd;
                 }else
                 if(enemy_bullet_d == 270){
-                    enemy_bullet_x = enemy_bullet_x - 3;
+                    enemy_bullet_x = enemy_bullet_x - enemy_bullet_spd;
                 }
             }
         }
@@ -292,24 +298,36 @@ int main(void)
             gameover = 1;
         }
 
+        bool got_item = CheckCollisionCircles((Vector2){tank_x, tank_y}, 25, (Vector2){item_x, item_y}, 15);
+        if(got_item){
+            item_x = -100;
+            item_y = -100;
+        }
+
         if (enemy_life>0){
+            enemy_spd = GetTime() / 15 + 1;
             if (enemy_d == 0){
-                enemy_y = enemy_y - 1;
+                enemy_y = enemy_y - enemy_spd;
             }else
             if (enemy_d == 90){
-                enemy_x = enemy_x + 1;
+                enemy_x = enemy_x + enemy_spd;
             }else
             if (enemy_d == 180){
-                enemy_y = enemy_y + 1;
+                enemy_y = enemy_y + enemy_spd;
             }else
             if (enemy_d == 270){
-                enemy_x = enemy_x - 1;
+                enemy_x = enemy_x - enemy_spd;
             }
 
             if (enemy_x < 0 || 800 < enemy_x || enemy_y < 0 || 450 < enemy_y){
                 enemy_appear(&enemy_x,&enemy_y,&enemy_d,&enemy_life);
             }
         }else{
+            if(rand()%3 == 0){
+                item_x = enemy_x;
+                item_y = enemy_y;
+            }
+
             score += 10;
             if (score >= clearscore){
                 score = clearscore;
@@ -332,6 +350,9 @@ int main(void)
         BeginDrawing();
 
             ClearBackground(RAYWHITE);
+
+            //アイテムの表示
+            DrawCircle(item_x, item_y, 15, RED);
 
             //自分の表示
             Vector2 tank_origin = {tank.width / 2.0f,tank.height / 2.0f};
