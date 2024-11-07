@@ -18,8 +18,8 @@ void Bullet_init(struct Bullet* this){
     this->d = 0;
 }
 
-void Bullet_shot(struct Bullet* this, int tank_x, int tank_y, int tank_d){
-    this->s = 1;
+void Bullet_shot(struct Bullet* this, int tank_x, int tank_y, int tank_d, int tank_s){
+    this->s = tank_s + 1;
     this->x = tank_x;
     this->y = tank_y;
     this->d = tank_d;
@@ -89,6 +89,7 @@ int main(void)
     int tank_x = 400;
     int tank_y = 225;
     int tank_d = 0;
+    int tank_s = 1;
     
     Texture2D enemy = LoadTexture("enemy_tank.png");
     
@@ -155,48 +156,48 @@ int main(void)
             if (abs(distance_x) > abs(distance_y) ){//横移動のとき
                 if (distance_x > 0){//右移動
                     tank_d = 90;
-                    tank_x = tank_x + 1;
+                    tank_x = tank_x + tank_s;
                 }else{//左移動
                     tank_d = 270;
-                    tank_x = tank_x - 1;
+                    tank_x = tank_x - tank_s;
                 }
             }else
             if (abs(distance_y) > abs(distance_x) ){//縦移動のとき
                 if (distance_y > 0){//下移動
                     tank_d = 180;
-                    tank_y = tank_y + 1;
+                    tank_y = tank_y + tank_s;
                 }else{//上移動
                     tank_d = 0;
-                    tank_y = tank_y - 1;
+                    tank_y = tank_y - tank_s;
                 }
             }
         }
         if (IsKeyDown(KEY_UP)){
             if (tank_d == 0){
-                tank_y = tank_y - 1;
+                tank_y = tank_y - tank_s;
             }else
             if (tank_d == 90){
-                tank_x = tank_x + 1;
+                tank_x = tank_x + tank_s;
             }else
             if (tank_d == 180){
-                tank_y = tank_y + 1;
+                tank_y = tank_y + tank_s;
             }else
             if (tank_d == 270){
-                tank_x = tank_x - 1;
+                tank_x = tank_x - tank_s;
             }
         }else
         if (IsKeyDown(KEY_DOWN)){
             if (tank_d == 0){
-                tank_y = tank_y + 1;
+                tank_y = tank_y + tank_s;
             }else
             if (tank_d == 90){
-                tank_x = tank_x - 1;
+                tank_x = tank_x - tank_s;
             }else
             if (tank_d == 180){
-                tank_y = tank_y - 1;
+                tank_y = tank_y - tank_s;
             }else
             if (tank_d == 270){
-                tank_x = tank_x + 1;
+                tank_x = tank_x + tank_s;
             }
         }else
         if (IsKeyPressed(KEY_RIGHT)){
@@ -216,7 +217,7 @@ int main(void)
         if (IsKeyPressed(KEY_SPACE) && is_bullet_on_screen==0 ){
             struct Bullet* pbullet = takeUnusedBullet(bullets, BULL_N);
             if(pbullet){
-                Bullet_shot(pbullet, tank_x, tank_y, tank_d);
+                Bullet_shot(pbullet, tank_x, tank_y, tank_d, tank_s);
             }else{
                 // none
             }
@@ -251,16 +252,16 @@ int main(void)
         int i = BULL_N;
         while(0 <= --i){
             if (bullets[i].s && bullets[i].d == 0){
-                bullets[i].y = bullets[i].y - 3;
+                bullets[i].y = bullets[i].y - bullets[i].s;
             }else
             if (bullets[i].s && bullets[i].d == 90){
-                bullets[i].x = bullets[i].x + 3;
+                bullets[i].x = bullets[i].x + bullets[i].s;
             }else
             if (bullets[i].s && bullets[i].d == 180){
-                bullets[i].y = bullets[i].y + 3;
+                bullets[i].y = bullets[i].y + bullets[i].s;
             }else
             if (bullets[i].s && bullets[i].d == 270){
-                bullets[i].x = bullets[i].x - 3;
+                bullets[i].x = bullets[i].x - bullets[i].s;
             }
         }
 
@@ -302,6 +303,7 @@ int main(void)
         if(got_item){
             item_x = -100;
             item_y = -100;
+            tank_s = tank_s + 2;
         }
 
         if (enemy_life>0){
