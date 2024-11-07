@@ -85,6 +85,8 @@ int main(void)
     InitWindow(screenWidth, screenHeight, "raylib [core] example - basic window");
     SetTargetFPS(60);
 
+    InitAudioDevice();
+
     Texture2D tank = LoadTexture("tank.png");
     int tank_x = 400;
     int tank_y = 225;
@@ -113,6 +115,8 @@ int main(void)
     while(0 <= --j){
         Bullet_init(&bullets[j]);
     }
+
+    Sound baaan = LoadSound("baaan.wav");
 
     int gameover = 0;
 
@@ -218,6 +222,7 @@ int main(void)
             struct Bullet* pbullet = takeUnusedBullet(bullets, BULL_N);
             if(pbullet){
                 Bullet_shot(pbullet, tank_x, tank_y, tank_d, tank_s);
+                PlaySound(baaan);
             }else{
                 // none
             }
@@ -286,6 +291,21 @@ int main(void)
         }
 
         {
+            if(tank_x < 0){
+                tank_x = 0 + 80;
+            }
+            if(800 < tank_x){
+                tank_x = 800 - 80;
+            }
+            if(tank_y < 0){
+                tank_y = 0 + 80;
+            }
+            if(450 < tank_y){
+                tank_y = 450 - 80;
+            }
+        }
+
+        {
             int x_distance = tank_x - enemy_bullet_x;
             int y_distance = tank_y - enemy_bullet_y;
             if (x_distance > -25 && x_distance < 25 && y_distance > -25 && y_distance < 25 ){
@@ -350,8 +370,15 @@ int main(void)
         }
 
         BeginDrawing();
-
             ClearBackground(RAYWHITE);
+
+            float progress = (float)score / clearscore;
+            DrawRectangle(10,10,300,25,GRAY);
+            DrawRectangle(10,10,(int)300 * progress,25,GREEN);
+
+            char progressText[20];
+            sprintf(progressText,"%d%%",(int)(progress*100));
+            DrawText(progressText,350,10,50,BLACK);
 
             //アイテムの表示
             DrawCircle(item_x, item_y, 15, RED);
@@ -407,14 +434,6 @@ int main(void)
             sprintf(scoreText,"Score: %d",score);
             DrawText(scoreText,10,10,50,GREEN);
         */
-        float progress = (float)score / clearscore;
-        DrawRectangle(10,10,300,25,GRAY);
-        DrawRectangle(10,10,(int)300 * progress,25,GREEN);
-
-        char progressText[20];
-        sprintf(progressText,"%d%%",(int)(progress*100));
-        DrawText(progressText,350,10,50,BLACK);
-
         EndDrawing();
     }
     CloseWindow();
