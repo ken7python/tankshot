@@ -390,12 +390,6 @@ int main(void)
             DrawTexturePro(tank, tank_sourceRect, tank_destRect, tank_origin, tank_d, WHITE);
 
             //弾の表示
-            // Vector2 bullet_origin = {bullet.width / 2.0f,bullet.height / 2.0f};
-            // Rectangle bullet_sourceRect = {0.0f,0.0f,(float)bullet.width,(float)bullet.height};
-            // Rectangle bullet_destRect = {bullet_x,bullet_y,(float)bullet.width,bullet.height};
-            // //DrawTextureEx(bullet,(Vector2){bullet_x,bullet_y},bullet_d,1.0,WHITE);
-            // DrawTexturePro(bullet, bullet_sourceRect, bullet_destRect, bullet_origin, enemy_d, WHITE);
-            // //DrawTextureEx(tank,(Vector2){tank_x,tank_y},tank_d,1.0,WHITE);
             int i=BULL_N;
             while(0 <= --i){
                 Bullet_draw(&bullets[i], &bullet);
@@ -424,16 +418,6 @@ int main(void)
                 DrawText("GAMECLEAR",200,150,70,SKYBLUE);
                 DrawText(TextFormat("Time:%d Second",clear_time),150,250,70,SKYBLUE);
             }
-            /*
-            DrawCircle(tank_x,tank_y,5,RED);
-            DrawCircle(enemy_x,enemy_y,5,BLUE);
-            DrawCircle(bullet_x,bullet_y,5,YELLOW);
-            */
-        /*
-            char scoreText[20];
-            sprintf(scoreText,"Score: %d",score);
-            DrawText(scoreText,10,10,50,GREEN);
-        */
         EndDrawing();
     }
     CloseWindow();
