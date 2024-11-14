@@ -142,6 +142,11 @@ int main(void)
     int item_x = -100;
     int item_y = -100;
 
+    Sound item_get = LoadSound("item_get.mp3");
+    Sound gameclear_sound = LoadSound("gameclear.mp3");
+    Sound gameover_sound = LoadSound("gameover.mp3");
+    Sound gekiha = LoadSound("explosion.mp3");
+
     while (!WindowShouldClose())
     {
         if (gameover == 0 && gameclear == 0){
@@ -310,6 +315,7 @@ int main(void)
             int y_distance = tank_y - enemy_bullet_y;
             if (x_distance > -25 && x_distance < 25 && y_distance > -25 && y_distance < 25 ){
                 gameover = 1;
+                PlaySound(gameover_sound);
             }
         }
 
@@ -317,6 +323,7 @@ int main(void)
         int player_enemy_y = enemy_y - tank_y;
         if (enemy_life > 0 && player_enemy_x > -25 && player_enemy_x < 25 && player_enemy_y > -25 && player_enemy_y < 25 ){
             gameover = 1;
+            PlaySound(gameover_sound);
         }
 
         bool got_item = CheckCollisionCircles((Vector2){tank_x, tank_y}, 25, (Vector2){item_x, item_y}, 15);
@@ -324,6 +331,7 @@ int main(void)
             item_x = -100;
             item_y = -100;
             tank_s = tank_s + 2;
+            PlaySound(item_get);
         }
 
         if (enemy_life>0){
@@ -354,9 +362,11 @@ int main(void)
             if (score >= clearscore){
                 score = clearscore;
                 gameclear = 1;
+                PlaySound(gameclear_sound);
                 clear_time = GetTime();
             }
             else{
+                PlaySound(gekiha);
                 enemy_appear(&enemy_x,&enemy_y,&enemy_d,&enemy_life);
             }
         }
