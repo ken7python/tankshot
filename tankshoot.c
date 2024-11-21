@@ -37,6 +37,18 @@ void Bullet_draw(struct Bullet* this, Texture2D* bullet){
 
 
 
+struct Landmine{
+    int x;
+    int y;
+};
+
+void Landmine_init(struct Landmine* this){
+    this->x = 0;
+    this->y = 0;
+}
+
+
+
 // for Bullets[]
 struct Bullet* takeUnusedBullet(struct Bullet bullets[], int count){
     while(0 <= --count){
@@ -87,13 +99,13 @@ int main(void)
 
     InitAudioDevice();
 
-    Texture2D tank = LoadTexture("tank.png");
+    Texture2D tank = LoadTexture("res/tank.png");
     int tank_x = 400;
     int tank_y = 225;
     int tank_d = 0;
     int tank_s = 1;
     
-    Texture2D enemy = LoadTexture("enemy_tank.png");
+    Texture2D enemy = LoadTexture("res/enemy_tank.png");
     
     int enemy_x = 0;
     int enemy_y = 0;
@@ -102,7 +114,7 @@ int main(void)
     int enemy_life = 0;
     enemy_appear(&enemy_x,&enemy_y,&enemy_d,&enemy_life);
 
-    Texture2D bullet = LoadTexture("bullet.png");
+    Texture2D bullet = LoadTexture("res/bullet.png");
     int bullet_x = -100;
     int bullet_y = -100;
     int bullet_d = 0;
@@ -116,7 +128,11 @@ int main(void)
         Bullet_init(&bullets[j]);
     }
 
-    Sound baaan = LoadSound("baaan.wav");
+    Texture2D landmine = LoadTexture("res/landmine.png");
+    struct Landmine lmine;
+    Landmine_init(&lmine);
+
+    Sound baaan = LoadSound("res/baaan.wav");
 
     int gameover = 0;
 
@@ -132,7 +148,7 @@ int main(void)
 
     int hera_time = GetTime();//スコアを減らすタイム
 
-    Texture2D enemy_bullet = LoadTexture("enemy_bullet.png");
+    Texture2D enemy_bullet = LoadTexture("res/enemy_bullet.png");
     int enemy_bullet_x = -100;
     int enemy_bullet_y = -100;
     int enemy_bullet_d = 0;
@@ -142,10 +158,10 @@ int main(void)
     int item_x = -100;
     int item_y = -100;
 
-    Sound item_get = LoadSound("item_get.mp3");
-    Sound gameclear_sound = LoadSound("gameclear.mp3");
-    Sound gameover_sound = LoadSound("gameover.mp3");
-    Sound gekiha = LoadSound("explosion.mp3");
+    Sound item_get = LoadSound("res/item_get.mp3");
+    Sound gameclear_sound = LoadSound("res/gameclear.mp3");
+    Sound gameover_sound = LoadSound("res/gameover.mp3");
+    Sound gekiha = LoadSound("res/explosion.mp3");
 
     while (!WindowShouldClose())
     {
@@ -224,13 +240,20 @@ int main(void)
             }
         }
         if (IsKeyPressed(KEY_SPACE) && is_bullet_on_screen==0 ){
-            struct Bullet* pbullet = takeUnusedBullet(bullets, BULL_N);
-            if(pbullet){
-                Bullet_shot(pbullet, tank_x, tank_y, tank_d, tank_s);
-                PlaySound(baaan);
+            if(IsKeyDown(KEY_LEFT_SHIFT)){
+                lmine.x = tank_x;
+                lmine.y = tank_y;
             }else{
-                // none
+                struct Bullet* pbullet = takeUnusedBullet(bullets, BULL_N);
+                if(pbullet){
+                    Bullet_shot(pbullet, tank_x, tank_y, tank_d, tank_s);
+                    PlaySound(baaan);
+                }else{
+                    // none
+                }
+                
             }
+
         }
 
         // enemy_think
@@ -389,6 +412,14 @@ int main(void)
             char progressText[20];
             sprintf(progressText,"%d%%",(int)(progress*100));
             DrawText(progressText,350,10,50,BLACK);
+
+            //地雷の表示
+            {
+                Vector2 origin = {landmine.width / 2.0f,landmine.height / 2.0f};
+                Rectangle sourceRect = {0.0f,0.0f,(float)landmine.width,(float)landmine.height};
+                Rectangle destRect = {lmine.x,lmine.y,(float)landmine.width,landmine.height};
+                DrawTexturePro(landmine, sourceRect, destRect, origin, 0, WHITE);
+            }
 
             //アイテムの表示
             DrawCircle(item_x, item_y, 15, RED);
