@@ -171,6 +171,8 @@ int main(void)
     Sound gameover_sound = LoadSound("res/gameover.mp3");
     Sound gekiha = LoadSound("res/explosion.mp3");
 
+    Texture2D background = LoadTexture("res/background.png");
+
     while (!WindowShouldClose())
     {
         if (gameover == 0 && gameclear == 0){
@@ -414,6 +416,7 @@ int main(void)
 
         BeginDrawing();
             ClearBackground(RAYWHITE);
+            DrawTexture(background,0,0,WHITE);
 
             float progress = (float)score / clearscore;
             DrawRectangle(10,10,300,25,GRAY);
