@@ -43,8 +43,16 @@ struct Landmine{
 };
 
 void Landmine_init(struct Landmine* this){
-    this->x = 0;
-    this->y = 0;
+    this->x = -100;
+    this->y = -100;
+}
+
+void Landmine_col(struct Landmine* this, int* enemy_x, int* enemy_y,int* enemy_life){
+    bool got_landmine = CheckCollisionCircles((Vector2){*enemy_x, *enemy_y}, 25, (Vector2){this->x, this->y}, 15);
+    if (got_landmine){
+        *enemy_life = 0;
+        Landmine_init(this);
+    }
 }
 
 
@@ -240,7 +248,7 @@ int main(void)
             }
         }
         if (IsKeyPressed(KEY_SPACE) && is_bullet_on_screen==0 ){
-            if(IsKeyDown(KEY_LEFT_SHIFT)){
+            if(IsKeyDown(KEY_LEFT_SHIFT) && lmine.x == -100 && lmine.y == -100){
                 lmine.x = tank_x;
                 lmine.y = tank_y;
             }else{
@@ -356,6 +364,8 @@ int main(void)
             tank_s = tank_s + 2;
             PlaySound(item_get);
         }
+
+        Landmine_col(&lmine, &enemy_x, &enemy_y, &enemy_life);
 
         if (enemy_life>0){
             enemy_spd = GetTime() / 15 + 1;
