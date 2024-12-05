@@ -40,11 +40,13 @@ void Bullet_draw(struct Bullet* this, Texture2D* bullet){
 struct Landmine{
     int x;
     int y;
+    int active;
 };
 
 void Landmine_init(struct Landmine* this){
     this->x = -100;
     this->y = -100;
+    this->active = 0;
 }
 
 void Landmine_col(struct Landmine* this, int* enemy_x, int* enemy_y,int* enemy_life){
@@ -53,6 +55,22 @@ void Landmine_col(struct Landmine* this, int* enemy_x, int* enemy_y,int* enemy_l
         *enemy_life = 0;
         Landmine_init(this);
     }
+}
+
+int Landmine_col_tank(struct Landmine* this, int* tank_x, int* tank_y){
+    bool got_landmine = CheckCollisionCircles((Vector2){*tank_x, *tank_y}, 25, (Vector2){this->x, this->y}, 15);
+    if (got_landmine){
+        if(this->active){
+            Landmine_init(this);
+            return 1;
+        }
+    }else{
+        if(!this->active && this->x != -100 && this->y -100){
+            this->active = 1;
+        }
+    }
+
+    return 0;
 }
 
 
@@ -405,6 +423,12 @@ int main(void)
                 enemy_appear(&enemy_x,&enemy_y,&enemy_d,&enemy_life);
             }
         }
+        }
+
+        int lct = Landmine_col_tank(&lmine, &tank_x, &tank_y);
+        if(lct){
+            gameover = 1;
+            PlaySound(gameover_sound);
         }
 
         if(0 < score && !gameclear && !gameover){
