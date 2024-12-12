@@ -113,16 +113,16 @@ void enemy_appear(int* x,int* y,int *d,int* life ){
 
 }
 
+const int screenWidth = 800;
+const int screenHeight = 450;
+
 int main2(void)
 {
     int ret = 0;
 
-    int score = 0;
+    double start_time = GetTime();
 
-    const int screenWidth = 800;
-    const int screenHeight = 450;
-    InitWindow(screenWidth, screenHeight, "raylib [core] example - basic window");
-    SetTargetFPS(60);
+    int score = 0;
 
     Texture2D tank = LoadTexture("res/tank.png");
     int tank_x = 400;
@@ -135,7 +135,7 @@ int main2(void)
     int enemy_x = 0;
     int enemy_y = 0;
     int enemy_d = 0;
-    int enemy_spd = 5;
+    int enemy_spd = 1;
     int enemy_life = 0;
     enemy_appear(&enemy_x,&enemy_y,&enemy_d,&enemy_life);
 
@@ -390,7 +390,7 @@ int main2(void)
             Landmine_col(&lmine, &enemy_x, &enemy_y, &enemy_life);
 
             if (enemy_life>0){
-                enemy_spd = GetTime() / 15 + 1;
+                enemy_spd = (GetTime()-start_time) / 15 + 1;
                 if (enemy_d == 0){
                     enemy_y = enemy_y - enemy_spd;
                 }else
@@ -418,7 +418,7 @@ int main2(void)
                     score = clearscore;
                     gameclear = 1;
                     PlaySound(gameclear_sound);
-                    clear_time = GetTime();
+                    clear_time = GetTime() - start_time;
                 }
                 else{
                     PlaySound(gekiha);
@@ -508,7 +508,6 @@ int main2(void)
             }
         EndDrawing();
     }
-    CloseWindow();
     return ret;
 }
 
@@ -516,9 +515,12 @@ int main(void){
     srand(time(NULL));
     InitAudioDevice();
 
-    int r = 1;
-    while(r == 1){
-        r = main2();
-    }
+    InitWindow(screenWidth, screenHeight, "raylib [core] example - basic window");
+    SetTargetFPS(60);
+
+    int r;
+    while((r = main2()) == 1);
+
+    CloseWindow();
     return r;
 }
