@@ -113,17 +113,16 @@ void enemy_appear(int* x,int* y,int *d,int* life ){
 
 }
 
-int main(void)
+int main2(void)
 {
+    int ret = 0;
+
     int score = 0;
-    srand(time(NULL));
 
     const int screenWidth = 800;
     const int screenHeight = 450;
     InitWindow(screenWidth, screenHeight, "raylib [core] example - basic window");
     SetTargetFPS(60);
-
-    InitAudioDevice();
 
     Texture2D tank = LoadTexture("res/tank.png");
     int tank_x = 400;
@@ -194,235 +193,243 @@ int main(void)
     while (!WindowShouldClose())
     {
         if (gameover == 0 && gameclear == 0){
-        mouse_x = GetTouchX();
-        mouse_y = GetTouchY();
-        distance_x = mouse_x - tank_x;//マウスと戦車との距離X
-        distance_y = mouse_y - tank_y;//マウスと戦車との距離Y
-        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){//タップされたとき
-            if (abs(distance_x) < 25 && abs(distance_y) < 25  && is_bullet_on_screen==0){//戦車がクリックされ、弾発射中でないなら発射
-                bullet_x = tank_x;
-                bullet_y = tank_y;
-                bullet_d = tank_d;
+            mouse_x = GetTouchX();
+            mouse_y = GetTouchY();
+            distance_x = mouse_x - tank_x;//マウスと戦車との距離X
+            distance_y = mouse_y - tank_y;//マウスと戦車との距離Y
+            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){//タップされたとき
+                if (abs(distance_x) < 25 && abs(distance_y) < 25  && is_bullet_on_screen==0){//戦車がクリックされ、弾発射中でないなら発射
+                    bullet_x = tank_x;
+                    bullet_y = tank_y;
+                    bullet_d = tank_d;
+                }
             }
-        }
-        if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) && (abs(distance_x) > 25 || abs(distance_y) > 25) ){//画面が押され、戦車がクリックされていないとき
-            if (abs(distance_x) > abs(distance_y) ){//横移動のとき
-                if (distance_x > 0){//右移動
-                    tank_d = 90;
+            if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) && (abs(distance_x) > 25 || abs(distance_y) > 25) ){//画面が押され、戦車がクリックされていないとき
+                if (abs(distance_x) > abs(distance_y) ){//横移動のとき
+                    if (distance_x > 0){//右移動
+                        tank_d = 90;
+                        tank_x = tank_x + tank_s;
+                    }else{//左移動
+                        tank_d = 270;
+                        tank_x = tank_x - tank_s;
+                    }
+                }else
+                if (abs(distance_y) > abs(distance_x) ){//縦移動のとき
+                    if (distance_y > 0){//下移動
+                        tank_d = 180;
+                        tank_y = tank_y + tank_s;
+                    }else{//上移動
+                        tank_d = 0;
+                        tank_y = tank_y - tank_s;
+                    }
+                }
+            }
+            if (IsKeyDown(KEY_UP)){
+                if (tank_d == 0){
+                    tank_y = tank_y - tank_s;
+                }else
+                if (tank_d == 90){
                     tank_x = tank_x + tank_s;
-                }else{//左移動
-                    tank_d = 270;
+                }else
+                if (tank_d == 180){
+                    tank_y = tank_y + tank_s;
+                }else
+                if (tank_d == 270){
                     tank_x = tank_x - tank_s;
                 }
             }else
-            if (abs(distance_y) > abs(distance_x) ){//縦移動のとき
-                if (distance_y > 0){//下移動
-                    tank_d = 180;
+            if (IsKeyDown(KEY_DOWN)){
+                if (tank_d == 0){
                     tank_y = tank_y + tank_s;
-                }else{//上移動
-                    tank_d = 0;
+                }else
+                if (tank_d == 90){
+                    tank_x = tank_x - tank_s;
+                }else
+                if (tank_d == 180){
                     tank_y = tank_y - tank_s;
+                }else
+                if (tank_d == 270){
+                    tank_x = tank_x + tank_s;
+                }
+            }else
+            if (IsKeyPressed(KEY_RIGHT)){
+                tank_d = tank_d + 90;
+
+                if (tank_d == 360){
+                    tank_d = 0;
+                }
+            }else
+            if (IsKeyPressed(KEY_LEFT)){
+                tank_d = tank_d - 90;
+                
+                if (tank_d == -90){
+                    tank_d = 270;
                 }
             }
-        }
-        if (IsKeyDown(KEY_UP)){
-            if (tank_d == 0){
-                tank_y = tank_y - tank_s;
-            }else
-            if (tank_d == 90){
-                tank_x = tank_x + tank_s;
-            }else
-            if (tank_d == 180){
-                tank_y = tank_y + tank_s;
-            }else
-            if (tank_d == 270){
-                tank_x = tank_x - tank_s;
-            }
-        }else
-        if (IsKeyDown(KEY_DOWN)){
-            if (tank_d == 0){
-                tank_y = tank_y + tank_s;
-            }else
-            if (tank_d == 90){
-                tank_x = tank_x - tank_s;
-            }else
-            if (tank_d == 180){
-                tank_y = tank_y - tank_s;
-            }else
-            if (tank_d == 270){
-                tank_x = tank_x + tank_s;
-            }
-        }else
-        if (IsKeyPressed(KEY_RIGHT)){
-            tank_d = tank_d + 90;
+            if (IsKeyPressed(KEY_SPACE) && is_bullet_on_screen==0 ){
+                if(IsKeyDown(KEY_LEFT_SHIFT) && lmine.x == -100 && lmine.y == -100){
+                    lmine.x = tank_x;
+                    lmine.y = tank_y;
+                }else{
+                    struct Bullet* pbullet = takeUnusedBullet(bullets, BULL_N);
+                    if(pbullet){
+                        Bullet_shot(pbullet, tank_x, tank_y, tank_d, tank_s);
+                        PlaySound(baaan);
+                    }else{
+                        // none
+                    }
+                    
+                }
 
-            if (tank_d == 360){
-                tank_d = 0;
             }
-        }else
-        if (IsKeyPressed(KEY_LEFT)){
-            tank_d = tank_d - 90;
-            
-            if (tank_d == -90){
-                tank_d = 270;
+            if(IsKeyPressed(KEY_F)){
+                ToggleFullscreen();
             }
-        }
-        if (IsKeyPressed(KEY_SPACE) && is_bullet_on_screen==0 ){
-            if(IsKeyDown(KEY_LEFT_SHIFT) && lmine.x == -100 && lmine.y == -100){
-                lmine.x = tank_x;
-                lmine.y = tank_y;
-            }else{
-                struct Bullet* pbullet = takeUnusedBullet(bullets, BULL_N);
-                if(pbullet){
-                    Bullet_shot(pbullet, tank_x, tank_y, tank_d, tank_s);
-                    PlaySound(baaan);
+
+            // enemy_think
+            {
+                if(5 < GetTime() - enemy_bullet_t){
+                    enemy_bullet_x = enemy_x;
+                    enemy_bullet_y = enemy_y;
+                    enemy_bullet_d = enemy_d;
+                    enemy_bullet_spd = enemy_spd + 3;
+                    enemy_bullet_t = GetTime();
+                }
+
+                if(enemy_bullet_x != -100 && enemy_bullet_y != -100){
+                    if(enemy_bullet_d == 0){
+                        enemy_bullet_y = enemy_bullet_y - enemy_bullet_spd;
+                    }else
+                    if(enemy_bullet_d == 90){
+                        enemy_bullet_x = enemy_bullet_x + enemy_bullet_spd;
+                    }else
+                    if(enemy_bullet_d == 180){
+                        enemy_bullet_y = enemy_bullet_y + enemy_bullet_spd;
+                    }else
+                    if(enemy_bullet_d == 270){
+                        enemy_bullet_x = enemy_bullet_x - enemy_bullet_spd;
+                    }
+                }
+            }
+
+            int i = BULL_N;
+            while(0 <= --i){
+                if (bullets[i].s && bullets[i].d == 0){
+                    bullets[i].y = bullets[i].y - bullets[i].s;
+                }else
+                if (bullets[i].s && bullets[i].d == 90){
+                    bullets[i].x = bullets[i].x + bullets[i].s;
+                }else
+                if (bullets[i].s && bullets[i].d == 180){
+                    bullets[i].y = bullets[i].y + bullets[i].s;
+                }else
+                if (bullets[i].s && bullets[i].d == 270){
+                    bullets[i].x = bullets[i].x - bullets[i].s;
+                }
+            }
+
+            i = BULL_N;
+            while(0 <= --i){
+                if (bullets[i].x < 0 || bullets[i].x > screenWidth || bullets[i].y < 0 || bullets[i].y > screenHeight){
+                    Bullet_init(&bullets[i]);
                 }else{
                     // none
                 }
-                
             }
 
-        }
-
-        // enemy_think
-        {
-            if(5 < GetTime() - enemy_bullet_t){
-                enemy_bullet_x = enemy_x;
-                enemy_bullet_y = enemy_y;
-                enemy_bullet_d = enemy_d;
-                enemy_bullet_spd = enemy_spd + 3;
-                enemy_bullet_t = GetTime();
-            }
-
-            if(enemy_bullet_x != -100 && enemy_bullet_y != -100){
-                if(enemy_bullet_d == 0){
-                    enemy_bullet_y = enemy_bullet_y - enemy_bullet_spd;
-                }else
-                if(enemy_bullet_d == 90){
-                    enemy_bullet_x = enemy_bullet_x + enemy_bullet_spd;
-                }else
-                if(enemy_bullet_d == 180){
-                    enemy_bullet_y = enemy_bullet_y + enemy_bullet_spd;
-                }else
-                if(enemy_bullet_d == 270){
-                    enemy_bullet_x = enemy_bullet_x - enemy_bullet_spd;
+            i = BULL_N;
+            while(0 <= --i){
+                if (bullets[i].s){
+                    int x_distance = enemy_x - bullets[i].x;
+                    int y_distance = enemy_y - bullets[i].y;
+                    if (x_distance > -25 && x_distance < 25 && y_distance > -25 && y_distance < 25 ){
+                        enemy_life = enemy_life - 1;
+                    }
                 }
             }
-        }
 
-        int i = BULL_N;
-        while(0 <= --i){
-            if (bullets[i].s && bullets[i].d == 0){
-                bullets[i].y = bullets[i].y - bullets[i].s;
-            }else
-            if (bullets[i].s && bullets[i].d == 90){
-                bullets[i].x = bullets[i].x + bullets[i].s;
-            }else
-            if (bullets[i].s && bullets[i].d == 180){
-                bullets[i].y = bullets[i].y + bullets[i].s;
-            }else
-            if (bullets[i].s && bullets[i].d == 270){
-                bullets[i].x = bullets[i].x - bullets[i].s;
+            {
+                if(tank_x < 0){
+                    tank_x = 0 + 80;
+                }
+                if(800 < tank_x){
+                    tank_x = 800 - 80;
+                }
+                if(tank_y < 0){
+                    tank_y = 0 + 80;
+                }
+                if(450 < tank_y){
+                    tank_y = 450 - 80;
+                }
             }
-        }
 
-        i = BULL_N;
-        while(0 <= --i){
-            if (bullets[i].x < 0 || bullets[i].x > screenWidth || bullets[i].y < 0 || bullets[i].y > screenHeight){
-                Bullet_init(&bullets[i]);
-            }else{
-                // none
-            }
-        }
-
-        i = BULL_N;
-        while(0 <= --i){
-            if (bullets[i].s){
-                int x_distance = enemy_x - bullets[i].x;
-                int y_distance = enemy_y - bullets[i].y;
+            {
+                int x_distance = tank_x - enemy_bullet_x;
+                int y_distance = tank_y - enemy_bullet_y;
                 if (x_distance > -25 && x_distance < 25 && y_distance > -25 && y_distance < 25 ){
-                    enemy_life = enemy_life - 1;
+                    gameover = 1;
+                    PlaySound(gameover_sound);
                 }
             }
-        }
 
-        {
-            if(tank_x < 0){
-                tank_x = 0 + 80;
-            }
-            if(800 < tank_x){
-                tank_x = 800 - 80;
-            }
-            if(tank_y < 0){
-                tank_y = 0 + 80;
-            }
-            if(450 < tank_y){
-                tank_y = 450 - 80;
-            }
-        }
-
-        {
-            int x_distance = tank_x - enemy_bullet_x;
-            int y_distance = tank_y - enemy_bullet_y;
-            if (x_distance > -25 && x_distance < 25 && y_distance > -25 && y_distance < 25 ){
+            int player_enemy_x = enemy_x - tank_x;
+            int player_enemy_y = enemy_y - tank_y;
+            if (enemy_life > 0 && player_enemy_x > -25 && player_enemy_x < 25 && player_enemy_y > -25 && player_enemy_y < 25 ){
                 gameover = 1;
                 PlaySound(gameover_sound);
             }
-        }
 
-        int player_enemy_x = enemy_x - tank_x;
-        int player_enemy_y = enemy_y - tank_y;
-        if (enemy_life > 0 && player_enemy_x > -25 && player_enemy_x < 25 && player_enemy_y > -25 && player_enemy_y < 25 ){
-            gameover = 1;
-            PlaySound(gameover_sound);
-        }
-
-        bool got_item = CheckCollisionCircles((Vector2){tank_x, tank_y}, 25, (Vector2){item_x, item_y}, 15);
-        if(got_item){
-            item_x = -100;
-            item_y = -100;
-            tank_s = tank_s + 2;
-            PlaySound(item_get);
-        }
-
-        Landmine_col(&lmine, &enemy_x, &enemy_y, &enemy_life);
-
-        if (enemy_life>0){
-            enemy_spd = GetTime() / 15 + 1;
-            if (enemy_d == 0){
-                enemy_y = enemy_y - enemy_spd;
-            }else
-            if (enemy_d == 90){
-                enemy_x = enemy_x + enemy_spd;
-            }else
-            if (enemy_d == 180){
-                enemy_y = enemy_y + enemy_spd;
-            }else
-            if (enemy_d == 270){
-                enemy_x = enemy_x - enemy_spd;
+            bool got_item = CheckCollisionCircles((Vector2){tank_x, tank_y}, 25, (Vector2){item_x, item_y}, 15);
+            if(got_item){
+                item_x = -100;
+                item_y = -100;
+                tank_s = tank_s + 2;
+                PlaySound(item_get);
             }
 
-            if (enemy_x < 0 || 800 < enemy_x || enemy_y < 0 || 450 < enemy_y){
-                enemy_appear(&enemy_x,&enemy_y,&enemy_d,&enemy_life);
+            Landmine_col(&lmine, &enemy_x, &enemy_y, &enemy_life);
+
+            if (enemy_life>0){
+                enemy_spd = GetTime() / 15 + 1;
+                if (enemy_d == 0){
+                    enemy_y = enemy_y - enemy_spd;
+                }else
+                if (enemy_d == 90){
+                    enemy_x = enemy_x + enemy_spd;
+                }else
+                if (enemy_d == 180){
+                    enemy_y = enemy_y + enemy_spd;
+                }else
+                if (enemy_d == 270){
+                    enemy_x = enemy_x - enemy_spd;
+                }
+
+                if (enemy_x < 0 || 800 < enemy_x || enemy_y < 0 || 450 < enemy_y){
+                    enemy_appear(&enemy_x,&enemy_y,&enemy_d,&enemy_life);
+                }
+            }else{
+                if(rand()%3 == 0){
+                    item_x = enemy_x;
+                    item_y = enemy_y;
+                }
+
+                score += 10;
+                if (score >= clearscore){
+                    score = clearscore;
+                    gameclear = 1;
+                    PlaySound(gameclear_sound);
+                    clear_time = GetTime();
+                }
+                else{
+                    PlaySound(gekiha);
+                    enemy_appear(&enemy_x,&enemy_y,&enemy_d,&enemy_life);
+                }
             }
         }else{
-            if(rand()%3 == 0){
-                item_x = enemy_x;
-                item_y = enemy_y;
+            if(IsKeyPressed(KEY_R)){
+                ret = 1;
+                break;
             }
-
-            score += 10;
-            if (score >= clearscore){
-                score = clearscore;
-                gameclear = 1;
-                PlaySound(gameclear_sound);
-                clear_time = GetTime();
-            }
-            else{
-                PlaySound(gekiha);
-                enemy_appear(&enemy_x,&enemy_y,&enemy_d,&enemy_life);
-            }
-        }
         }
 
         int lct = Landmine_col_tank(&lmine, &tank_x, &tank_y);
@@ -496,8 +503,22 @@ int main(void)
                 DrawText("GAMECLEAR",200,150,70,SKYBLUE);
                 DrawText(TextFormat("Time:%d Second",clear_time),150,250,70,SKYBLUE);
             }
+            if(gameover || gameclear){
+                DrawText("Press R Key to replay.", 120, 360, 50, WHITE);
+            }
         EndDrawing();
     }
     CloseWindow();
-    return 0;
+    return ret;
+}
+
+int main(void){
+    srand(time(NULL));
+    InitAudioDevice();
+
+    int r = 1;
+    while(r == 1){
+        r = main2();
+    }
+    return r;
 }
