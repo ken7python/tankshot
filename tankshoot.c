@@ -224,6 +224,30 @@ int main2(void)
                     }
                 }
             }
+
+            if(IsGamepadButtonDown(0, GAMEPAD_BUTTON_LEFT_FACE_UP)){
+                tank_d = 0;
+                tank_y = tank_y - tank_s;
+            }else
+            if(IsGamepadButtonDown(0, GAMEPAD_BUTTON_LEFT_FACE_DOWN)){
+                tank_d = 180;
+                tank_y = tank_y + tank_s;
+            }else
+            if(IsGamepadButtonDown(0, GAMEPAD_BUTTON_LEFT_FACE_RIGHT)){
+                tank_d = 90;
+                tank_x = tank_x + tank_s;
+            }else
+            if(IsGamepadButtonDown(0, GAMEPAD_BUTTON_LEFT_FACE_LEFT)){
+                tank_d = 270;
+                tank_x = tank_x - tank_s;
+            }
+
+            if(IsGamepadButtonPressed(0,GAMEPAD_BUTTON_RIGHT_FACE_UP) && lmine.x == -100 && lmine.y == -100){
+                lmine.x = tank_x;
+                lmine.y = tank_y;
+            }
+
+
             if (IsKeyDown(KEY_UP)){
                 if (tank_d == 0){
                     tank_y = tank_y - tank_s;
@@ -266,7 +290,7 @@ int main2(void)
                     tank_d = 270;
                 }
             }
-            if (IsKeyPressed(KEY_SPACE) && is_bullet_on_screen==0 ){
+            if (IsKeyPressed(KEY_SPACE) || IsGamepadButtonPressed(0,GAMEPAD_BUTTON_RIGHT_FACE_RIGHT) && is_bullet_on_screen==0 ){
                 if(IsKeyDown(KEY_LEFT_SHIFT) && lmine.x == -100 && lmine.y == -100){
                     lmine.x = tank_x;
                     lmine.y = tank_y;
@@ -426,7 +450,7 @@ int main2(void)
                 }
             }
         }else{
-            if(IsKeyPressed(KEY_R)){
+            if(IsKeyPressed(KEY_R) || IsGamepadButtonPressed(0,GAMEPAD_BUTTON_RIGHT_FACE_LEFT)){
                 ret = 1;
                 break;
             }
