@@ -1,16 +1,20 @@
 //cc tankshoot.c  libraylib.a -framework IOKit -framework Cocoa
+
+//ゲームを簡単に作れるためのプログラムを利用しますよ宣言
 #include "raylib.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
+//弾丸型（箱の形）
 struct Bullet{
-    int s;
-    int x;
-    int y;
-    int d;
+    int s;      //スピード
+    int x;      //x座標
+    int y;      //y座標
+    int d;      //方向
 };
 
+//弾丸の初期化
 void Bullet_init(struct Bullet* this){
     this->s = 0;
     this->x = -100;
@@ -18,6 +22,7 @@ void Bullet_init(struct Bullet* this){
     this->d = 0;
 }
 
+//弾丸の発射
 void Bullet_shot(struct Bullet* this, int tank_x, int tank_y, int tank_d, int tank_s){
     this->s = tank_s + 1;
     this->x = tank_x;
@@ -25,6 +30,7 @@ void Bullet_shot(struct Bullet* this, int tank_x, int tank_y, int tank_d, int ta
     this->d = tank_d;
 }
 
+//弾丸の描画
 void Bullet_draw(struct Bullet* this, Texture2D* bullet){
     if(this->s){
         Vector2 bullet_origin = {bullet->width / 2.0f,bullet->height / 2.0f};
@@ -36,19 +42,20 @@ void Bullet_draw(struct Bullet* this, Texture2D* bullet){
 // Bullet/
 
 
-
+//地雷型（合体箱）
 struct Landmine{
     int x;
     int y;
     int active;
 };
 
+//地雷の初期化
 void Landmine_init(struct Landmine* this){
     this->x = -100;
     this->y = -100;
     this->active = 0;
 }
-
+//地雷の当たり判定（敵）
 void Landmine_col(struct Landmine* this, int* enemy_x, int* enemy_y,int* enemy_life){
     bool got_landmine = CheckCollisionCircles((Vector2){*enemy_x, *enemy_y}, 25, (Vector2){this->x, this->y}, 15);
     if (got_landmine){
@@ -56,7 +63,7 @@ void Landmine_col(struct Landmine* this, int* enemy_x, int* enemy_y,int* enemy_l
         Landmine_init(this);
     }
 }
-
+//地雷の当たり判定（自分）
 int Landmine_col_tank(struct Landmine* this, int* tank_x, int* tank_y){
     bool got_landmine = CheckCollisionCircles((Vector2){*tank_x, *tank_y}, 25, (Vector2){this->x, this->y}, 15);
     if (got_landmine){
@@ -76,6 +83,7 @@ int Landmine_col_tank(struct Landmine* this, int* tank_x, int* tank_y){
 
 
 // for Bullets[]
+//撃てる弾を取る
 struct Bullet* takeUnusedBullet(struct Bullet bullets[], int count){
     while(0 <= --count){
         if(bullets[count].s){
@@ -89,7 +97,7 @@ struct Bullet* takeUnusedBullet(struct Bullet bullets[], int count){
 // Bullets/
 
 
-
+//敵の出現
 void enemy_appear(int* x,int* y,int *d,int* life ){
     *d = 90 * (rand()%4);
 
@@ -116,6 +124,7 @@ void enemy_appear(int* x,int* y,int *d,int* life ){
 const int screenWidth = 800;
 const int screenHeight = 450;
 
+//ゲームのメインプログラム
 int main2(void)
 {
     int ret = 0;
@@ -132,6 +141,7 @@ int main2(void)
     
     Texture2D enemy = LoadTexture("res/enemy_tank.png");
     
+    //敵の実体
     int enemy_x = 0;
     int enemy_y = 0;
     int enemy_d = 0;
@@ -140,11 +150,13 @@ int main2(void)
     enemy_appear(&enemy_x,&enemy_y,&enemy_d,&enemy_life);
 
     Texture2D bullet = LoadTexture("res/bullet.png");
+    //今は使われていない
     int bullet_x = -100;
     int bullet_y = -100;
     int bullet_d = 0;
     int is_bullet_on_screen = 0;
 
+    //自分の弾の実体
     #define BULL_N 3
     struct Bullet bullets[BULL_N];
 
@@ -153,6 +165,7 @@ int main2(void)
         Bullet_init(&bullets[j]);
     }
 
+    //地雷の実体
     Texture2D landmine = LoadTexture("res/landmine.png");
     struct Landmine lmine;
     Landmine_init(&lmine);
@@ -173,6 +186,7 @@ int main2(void)
 
     int hera_time = GetTime();//スコアを減らすタイム
 
+    //敵の弾の実体
     Texture2D enemy_bullet = LoadTexture("res/enemy_bullet.png");
     int enemy_bullet_x = -100;
     int enemy_bullet_y = -100;
@@ -180,6 +194,7 @@ int main2(void)
     int enemy_bullet_spd = 0;
     int enemy_bullet_t = GetTime();
 
+    //アイテムの実体
     int item_x = -100;
     int item_y = -100;
 
@@ -190,9 +205,11 @@ int main2(void)
 
     Texture2D background = LoadTexture("res/background.png");
 
+    //ゲームループ
     while (!WindowShouldClose())
     {
         if (gameover == 0 && gameclear == 0){
+            //入力受付
             mouse_x = GetTouchX();
             mouse_y = GetTouchY();
             distance_x = mouse_x - tank_x;//マウスと戦車との距離X
@@ -310,7 +327,7 @@ int main2(void)
                 ToggleFullscreen();
             }
 
-            // enemy_think
+            //敵の思考
             {
                 if(5 < GetTime() - enemy_bullet_t){
                     enemy_bullet_x = enemy_x;
@@ -336,6 +353,7 @@ int main2(void)
                 }
             }
 
+            //弾の動き
             int i = BULL_N;
             while(0 <= --i){
                 if (bullets[i].s && bullets[i].d == 0){
@@ -352,6 +370,7 @@ int main2(void)
                 }
             }
 
+            //場外の弾を弾倉に戻す
             i = BULL_N;
             while(0 <= --i){
                 if (bullets[i].x < 0 || bullets[i].x > screenWidth || bullets[i].y < 0 || bullets[i].y > screenHeight){
@@ -361,6 +380,7 @@ int main2(void)
                 }
             }
 
+            //敵と弾の当たり判定
             i = BULL_N;
             while(0 <= --i){
                 if (bullets[i].s){
@@ -372,6 +392,7 @@ int main2(void)
                 }
             }
 
+            //自分場外呼び戻し
             {
                 if(tank_x < 0){
                     tank_x = 0 + 80;
@@ -387,6 +408,7 @@ int main2(void)
                 }
             }
 
+            //自分と敵の弾の当たり判定
             {
                 int x_distance = tank_x - enemy_bullet_x;
                 int y_distance = tank_y - enemy_bullet_y;
