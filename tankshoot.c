@@ -542,13 +542,16 @@ int main2(void)
                 //DrawTextureEx(enemy,(Vector2){enemy_x,enemy_y},enemy_d,1.0,WHITE);
                 DrawTexturePro(enemy, enemy_sourceRect, enemy_destRect, enemy_origin, enemy_d, WHITE);
             }
+            //もしゲームオーバーならゲームオーバーと表示
             if (gameover == 1){
                 DrawText("GAMEOVER",200,200,70,RED);
             }
+            //もしゲームクリアならタイムを表示
             if (gameclear == 1){
                 DrawText("GAMECLEAR",200,150,70,SKYBLUE);
                 DrawText(TextFormat("Time:%d Second",clear_time),150,250,70,SKYBLUE);
             }
+            //ゲームオーバーまたはゲームクリアなら、Rキー押してね
             if(gameover || gameclear){
                 DrawText("Press R Key to replay.", 120, 360, 50, WHITE);
             }
